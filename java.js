@@ -14,10 +14,24 @@ notAlone.addEventListener('click', () => {
     start()
 })
 
-function start() {
+const start = (() => {
     modal.style.display = 'none'
     turn = 0;
-}
+    const data = {
+
+    }
+    game(data);
+})
 
 const takBox = document.querySelectorAll('.takBox')
 
+
+
+const game = ((data) =>{
+    data.turn = '0';
+    data.player1 = 'X';
+    data.player2 = 'O';
+    data.box = [1,2,3,4,5,6,7,8,9];
+    data.winValues = [1,5,9] && [1,2,3];
+    console.log(data)
+})

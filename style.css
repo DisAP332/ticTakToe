@@ -4,6 +4,9 @@
 }
 body {
     background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 div {
     border: 1px solid white;
@@ -18,4 +21,17 @@ body > .content {
 body > .content > .tikTacToe {
     grid-row: 2;
     grid-column: 2;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+body > .content > .xbox {
+    grid-column: 3;
+} 
+body > .modal {
+    display:block;
+    position: fixed;
+    z-index: 1;
+    background-color: white;
+
 }
