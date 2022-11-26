@@ -17,6 +17,17 @@ notAlone.addEventListener('click', () => {
 })
 
 //initialize buttons and variables 
+const winConditions = [
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
+    [0,4,8],
+    [2,4,6]
+]
+
 
 const initializeVars = (data) => {
     data.currentPlayer = 'X';
@@ -91,10 +102,20 @@ const playMove = (box, data) => {
 }
 
 const checkWin = (data) => {
-    const winBox = document.getElementById('winBox');
     console.log(data.player1Choices)
-    if(data.round === 9) {
-        winBox.textContent = 'TIE'
-        xbox.textContent = '';
+    winConditions.forEach((condition) => {
+            if (data.board[condition[0]] === data.board[condition[1]] &&
+                data.board[condition[1]] === data.board[condition[2]]){
+            declareWin(data)
+        }
+    })
+}
+
+const declareWin = (data) => {
+    const winBox = document.getElementById('winBox');
+    if (data.turn === 1) {
+        winBox.textContent = "Player X Won!"
+    } else {
+        winBox.textContent = 'Player O Won!'
     }
 }
