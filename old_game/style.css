@@ -1,0 +1,52 @@
+* {
+    margin: 0;
+    padding: 0;
+    color: orange;
+    font-size: 100px;
+}
+body {
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+div {
+    border: 1px solid white;
+}
+body > .content {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 600px 1fr;
+    grid-template-rows: 1fr 600px 1fr;
+}
+body > .content > .tikTacToe {
+    grid-row: 2;
+    grid-column: 2;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+body > .content > .xbox {
+    grid-column: 3;
+} 
+body > .modal {
+    display:block;
+    position: fixed;
+    z-index: 1;
+    background-color: white;
+
+}
+.box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 100px;
+    
+}
+.content > #obox, #xbox, #winBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
