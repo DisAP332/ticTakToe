@@ -276,6 +276,31 @@ function displayScores(player1: Player, player2: Player) {
   p2score.textContent = player2.score.toString();
 }
 
+function rematchGame(player1: Player, player2: Player) {
+  // reset names now in case of reset
+  player1.name = player_1_name.value;
+  // only on multi to preserve computer name
+  if (playstyle === "multi") {
+    player2.name = player_2_name.value;
+  }
+  clearBoard();
+  hideStartScreen();
+}
+
+function resetGame(game: Game) {
+  // reset scores
+  game.player1.resetScore();
+  game.player2.resetScore();
+  // reset score display
+  displayScores(game.player1, game.player2);
+  clearBoard();
+  // hide reset and show name inputs
+  hideResetButton();
+  showNameInputs();
+  start.textContent = "Start";
+  winnerBox.textContent = "";
+}
+
 function sendToStartScreen(game: Game, winner: string) {
   showStartScreen();
   // add winner text
@@ -301,28 +326,4 @@ function sendToStartScreen(game: Game, winner: string) {
   start.textContent = "Rematch";
   showResetButton();
   reset.addEventListener("click", () => resetGame(game));
-}
-
-function rematchGame(player1: Player, player2: Player) {
-  // reset names now in case of reset
-  player1.name = player_1_name.value;
-  // only on multi to preserve computer name
-  if (playstyle === "multi") {
-    player2.name = player_2_name.value;
-  }
-  clearBoard();
-  hideStartScreen();
-}
-
-function resetGame(game: Game) {
-  // reset scores
-  game.player1.resetScore();
-  game.player2.resetScore();
-  // reset score display
-  displayScores(game.player1, game.player2);
-  clearBoard();
-  // hide reset and show name inputs
-  hideResetButton();
-  showNameInputs();
-  start.textContent = "Start";
 }
