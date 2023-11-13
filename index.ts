@@ -14,6 +14,7 @@ const player2_turn_indiciator = document.getElementById(
 const Playstyle = document.getElementById("mode") as HTMLSelectElement;
 
 // input elements
+const name_inputs = document.getElementById("name_inputs") as HTMLDivElement;
 const player_1_name = document.getElementById("player1") as HTMLInputElement;
 const player_2_name = document.getElementById("player2") as HTMLInputElement;
 
@@ -43,9 +44,16 @@ Playstyle.addEventListener("change", () => {
 const start_screen = document.querySelector(".start_screen");
 const start = document.getElementById("start");
 const reset = document.getElementById("reset");
-const rematch = document.getElementById("rematch");
 
 start.addEventListener("click", startNewGame);
+
+function showResetButton() {
+  reset.classList.remove("hide");
+}
+
+function hideResetButton() {
+  reset.classList.add("hide");
+}
 
 function showStartScreen() {
   start_screen.classList.remove("hide");
@@ -55,6 +63,14 @@ function showStartScreen() {
 function hideStartScreen() {
   start_screen.classList.remove("show");
   start_screen.classList.add("hide");
+}
+
+function showNameInputs() {
+  name_inputs.classList.remove("hide");
+}
+
+function hideNameInputs() {
+  name_inputs.classList.add("hide");
 }
 
 // add player logic -------------------------------
@@ -173,7 +189,7 @@ class Game {
     }
   }
 
-  endGame(player: string) {
+  endGame(winner: string) {
     let scores = [this.player1.score, this.player2.score];
     this.turns = 0;
     this.turn = "player1";
@@ -182,7 +198,7 @@ class Game {
     this.player1.resetPositions();
     this.player2.resetPositions();
 
-    sendToStartScreen(player, this.resetWin.bind(this), scores);
+    sendToStartScreen(this, winner);
   }
 
   resetWin() {
@@ -222,15 +238,18 @@ function startNewGame() {
       ? new Player(player_2_name.value, 0, false, [])
       : new Player("Computer", 0, false, [])
   );
-  clearBoard();
   setBoxEvents(game);
+  hideNameInputs();
+  start.removeEventListener("click", startNewGame);
 }
 
 function setBoxEvents(game: Game) {
   for (let i = 1; i <= 9; i++) {
     let box = document.getElementById(`${i}`);
     box.addEventListener("click", () => {
-      game.takeTurn(i, box);
+      if (box.textContent !== "x" && box.textContent !== "o") {
+        game.takeTurn(i, box);
+      }
       // if playstyle is single and player1 has not won, execute computer logic
       if (playstyle === "single" && game.won === false) {
         // wait a second to make it look like computers thinking
@@ -251,28 +270,51 @@ function clearBoard() {
   }
 }
 
-function sendToStartScreen(
-  player: string,
-  resetWin: Function,
-  scores?: number[]
-) {
+function displayScores(player1: Player, player2: Player) {
+  p1score.textContent = player1.score.toString();
+  p2score.textContent = player2.score.toString();
+}
+
+function sendToStartScreen(game: Game, winner: string) {
   showStartScreen();
   // add winner text
-  if (player === "draw") {
+  if (winner === "draw") {
     winnerBox.textContent = "Draw!";
   } else {
-    winnerBox.textContent = `${player} wins!`;
+    winnerBox.textContent = `${winner} wins!`;
   }
 
   // add scores
-  p1score.textContent = scores ? scores[0].toString() : "0";
-  p2score.textContent = scores ? scores[1].toString() : "0";
+  displayScores(game.player1, game.player2);
 
-  // clear start screen begin new game
-  start.removeEventListener("click", startNewGame);
-  start.addEventListener("click", () => {
-    hideStartScreen();
-    clearBoard();
-    resetWin();
-  });
+  // reset game asyncronously so the call stack will clear
+  // and the computer will not take a turn after the game has been reset
+  setTimeout(() => {
+    game.won = false;
+  }, 100);
+
+  // change start to rematch game
+  start.addEventListener("click", () =>
+    rematchGame(game.player1, game.player2)
+  );
+  start.textContent = "Rematch";
+  showResetButton();
+  reset.addEventListener("click", () => resetGame(game));
+}
+
+function rematchGame(player1: Player, player2: Player) {
+  player1.name = player_1_name.value;
+  player2.name = player_2_name.value;
+  clearBoard();
+  hideStartScreen();
+}
+
+function resetGame(game: Game) {
+  game.player1.resetScore();
+  game.player2.resetScore();
+  displayScores(game.player1, game.player2);
+  clearBoard();
+  hideResetButton();
+  showNameInputs();
+  start.textContent = "Start";
 }

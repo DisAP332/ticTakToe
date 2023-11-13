@@ -6,6 +6,7 @@ var player2_turn_indiciator = document.getElementById("player2_turn_indiciator")
 // select elements
 var Playstyle = document.getElementById("mode");
 // input elements
+var name_inputs = document.getElementById("name_inputs");
 var player_1_name = document.getElementById("player1");
 var player_2_name = document.getElementById("player2");
 // h1 elements
@@ -30,8 +31,13 @@ Playstyle.addEventListener("change", function () {
 var start_screen = document.querySelector(".start_screen");
 var start = document.getElementById("start");
 var reset = document.getElementById("reset");
-var rematch = document.getElementById("rematch");
 start.addEventListener("click", startNewGame);
+function showResetButton() {
+    reset.classList.remove("hide");
+}
+function hideResetButton() {
+    reset.classList.add("hide");
+}
 function showStartScreen() {
     start_screen.classList.remove("hide");
     start_screen.classList.add("show");
@@ -39,6 +45,12 @@ function showStartScreen() {
 function hideStartScreen() {
     start_screen.classList.remove("show");
     start_screen.classList.add("hide");
+}
+function showNameInputs() {
+    name_inputs.classList.remove("hide");
+}
+function hideNameInputs() {
+    name_inputs.classList.add("hide");
 }
 var Player = /** @class */ (function () {
     function Player(name, score, turn, positions) {
@@ -121,14 +133,14 @@ var Game = /** @class */ (function () {
             this.endGame("draw");
         }
     };
-    Game.prototype.endGame = function (player) {
+    Game.prototype.endGame = function (winner) {
         var scores = [this.player1.score, this.player2.score];
         this.turns = 0;
         this.turn = "player1";
         // reset players positins
         this.player1.resetPositions();
         this.player2.resetPositions();
-        sendToStartScreen(player, this.resetWin.bind(this), scores);
+        sendToStartScreen(this, winner);
     };
     Game.prototype.resetWin = function () {
         this.won = false;
@@ -157,14 +169,17 @@ function startNewGame() {
     var game = new Game(false, "player1", 0, new Player(player_1_name.value, 0, true, []), playstyle === "multi"
         ? new Player(player_2_name.value, 0, false, [])
         : new Player("Computer", 0, false, []));
-    clearBoard();
     setBoxEvents(game);
+    hideNameInputs();
+    start.removeEventListener("click", startNewGame);
 }
 function setBoxEvents(game) {
     var _loop_1 = function (i) {
         var box = document.getElementById("".concat(i));
         box.addEventListener("click", function () {
-            game.takeTurn(i, box);
+            if (box.textContent !== "x" && box.textContent !== "o") {
+                game.takeTurn(i, box);
+            }
             // if playstyle is single and player1 has not won, execute computer logic
             if (playstyle === "single" && game.won === false) {
                 // wait a second to make it look like computers thinking
@@ -185,23 +200,46 @@ function clearBoard() {
         box.textContent = "";
     }
 }
-function sendToStartScreen(player, resetWin, scores) {
+function displayScores(player1, player2) {
+    p1score.textContent = player1.score.toString();
+    p2score.textContent = player2.score.toString();
+}
+function sendToStartScreen(game, winner) {
     showStartScreen();
     // add winner text
-    if (player === "draw") {
+    if (winner === "draw") {
         winnerBox.textContent = "Draw!";
     }
     else {
-        winnerBox.textContent = "".concat(player, " wins!");
+        winnerBox.textContent = "".concat(winner, " wins!");
     }
     // add scores
-    p1score.textContent = scores ? scores[0].toString() : "0";
-    p2score.textContent = scores ? scores[1].toString() : "0";
-    // clear start screen begin new game
-    start.removeEventListener("click", startNewGame);
+    displayScores(game.player1, game.player2);
+    // reset game asyncronously so the call stack will clear
+    // and the computer will not take a turn after the game has been reset
+    setTimeout(function () {
+        game.won = false;
+    }, 100);
+    // change start to rematch game
     start.addEventListener("click", function () {
-        hideStartScreen();
-        clearBoard();
-        resetWin();
+        return rematchGame(game.player1, game.player2);
     });
+    start.textContent = "Rematch";
+    showResetButton();
+    reset.addEventListener("click", function () { return resetGame(game); });
+}
+function rematchGame(player1, player2) {
+    player1.name = player_1_name.value;
+    player2.name = player_2_name.value;
+    clearBoard();
+    hideStartScreen();
+}
+function resetGame(game) {
+    game.player1.resetScore();
+    game.player2.resetScore();
+    displayScores(game.player1, game.player2);
+    clearBoard();
+    hideResetButton();
+    showNameInputs();
+    start.textContent = "Start";
 }
