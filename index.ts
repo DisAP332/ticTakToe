@@ -238,6 +238,7 @@ function startNewGame() {
       ? new Player(player_2_name.value, 0, false, [])
       : new Player("Computer", 0, false, [])
   );
+  console.log(game.player2);
   setBoxEvents(game);
   hideNameInputs();
   start.removeEventListener("click", startNewGame);
@@ -303,17 +304,24 @@ function sendToStartScreen(game: Game, winner: string) {
 }
 
 function rematchGame(player1: Player, player2: Player) {
+  // reset names now in case of reset
   player1.name = player_1_name.value;
-  player2.name = player_2_name.value;
+  // only on multi to preserve computer name
+  if (playstyle === "multi") {
+    player2.name = player_2_name.value;
+  }
   clearBoard();
   hideStartScreen();
 }
 
 function resetGame(game: Game) {
+  // reset scores
   game.player1.resetScore();
   game.player2.resetScore();
+  // reset score display
   displayScores(game.player1, game.player2);
   clearBoard();
+  // hide reset and show name inputs
   hideResetButton();
   showNameInputs();
   start.textContent = "Start";
